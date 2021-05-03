@@ -20,15 +20,14 @@ function testt(string)
 function showList(list)
 {
     chrome.storage.local.get(['teststring1'], function(result) {
-
-        if(result.teststring1 == null)
+        $('#mainTable').empty();
+        if(result.teststring1 == null || result.teststring1 == '')
             return;
         list = result.teststring1;
         console.log('Value currently is ' + list);
         var listArray = list.split(',');
         if(listArray.length > 0)
         {
-            $('#mainTable').empty();
             $('#mainTable').append('<table id="gg1" style="border:3px #cccccc solid;" cellpadding="10" border="1"><tr>'+
                 '<td>個股</td>'+
                 '<td>價格</td>'+
@@ -81,10 +80,18 @@ function search(string)
             if(data.ResultSet.Result[0].symbol == string+'.TW')
             {
                 chrome.storage.local.get(['teststring1'], function(result) {
-                    temp = result.teststring1;
-                    var listArray = temp.split(',');
-                    listArray.push(string);
-                    saveTemp = listArray.join(',');
+                    if(result.teststring1 == null || result.teststring1 == '')
+                    {
+                        saveTemp = string;
+                    }
+                    else
+                    {
+                        temp = result.teststring1;
+                        var listArray = temp.split(',');
+                        listArray.push(string);
+                        saveTemp = listArray.join(',');
+                    }
+
                     alert("Data: " + data.ResultSet.Result[0].symbol + "\n name: " + data.ResultSet.Result[0].name);
                     chrome.storage.local.set({
                         'teststring1': saveTemp
@@ -102,6 +109,8 @@ function search(string)
 function deleteList(id)
 {
     chrome.storage.local.get(['teststring1'], function(result) {
+        if(result.teststring1 == null)
+            return;
         temp = result.teststring1;
         var listArray = temp.split(',');
         listArray.removeEle(id);
