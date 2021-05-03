@@ -39,17 +39,26 @@ function showList(list)
                 '<td>外盤</td>'+
                 '<td>操作</td>'+
                 '</tr></table>');
+				
+			var count = 0;
             $.ajaxSettings.async = false;
             listArray.forEach(
-                item => {
+                item => {	
+					count ++;
                     $.get("https://tw.stock.yahoo.com/_td-stock/api/resource/StockServices.stockList;fields=avgPrice%2Corderbook;symbols="+item,
                         function(data,status){
                             if(data[0].change > 0)
                                 var color = 'red';
                             else
                                 var color = 'green';
-
+							
                             var clickId = 'cancelBtn_id_'+item;
+							var chartId = item + '_chart_' + count;
+							var chartIn = $('<div class="chart inMarket"></div>');
+							var chartOut = $('<div class="chart outMarket"></div>');
+							/* 長條圖 */
+							chartIn.css('width',data[0].inMarketPercentage);
+							chartOut.css('width',data[0].outMarketPercentage);
                             var itemobj = '<tr>'+
                                 '<td>'+item+'<br>'+data[0].symbolName+'</td>'+
                                 '<td>'+data[0].price+'</td>'+
@@ -57,20 +66,17 @@ function showList(list)
                                 '<td>'+data[0].regularMarketDayHigh+'</td>'+
                                 '<td>'+data[0].regularMarketDayLow+'</td>'+
                                 '<td>'+data[0].sectorName+'</td>'+
-                                '<td colspan="2" style="width:200px"><div class="text-wrap"><div class="text inMarket">'+data[0].inMarket+' ('+data[0].inMarketPercentage+')</div><div class="text outMarket">'+data[0].outMarket+' ('+data[0].outMarketPercentage+')</div></div>'+
-								'<div class="chart inMarket"></div><div class="chart outMarket"></div></td>'+
-                                
+                                '<td colspan="2" style="width:200px" id="'+ chartId +'" ><div class="text-wrap"><div class="text inMarket">'+data[0].inMarket+' ('+data[0].inMarketPercentage+')</div><div class="text outMarket">'+data[0].outMarket+' ('+data[0].outMarketPercentage+')</div></div>'+
                                 '<td><input id="'+clickId+'" type="button" value="X"></td>>'
                                 +'</tr>>'
                             ;
                             $('#gg1').append(itemobj);
+							$('#'+ chartId).append(chartIn);
+							$('#'+ chartId).append(chartOut);
+ 
                             $('#'+clickId).click(function(){
                                 deleteList(item);
                             });
-							/* 長條圖 */
-							$('.chart.inMarket').css('width',data[0].inMarketPercentage);
-							$('.chart.outMarket').css('width',data[0].outMarketPercentage);
-							
                         });
                 });
         }
