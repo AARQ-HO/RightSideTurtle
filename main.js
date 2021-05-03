@@ -57,8 +57,9 @@ function showList(list)
                                 '<td>'+data[0].regularMarketDayHigh+'</td>'+
                                 '<td>'+data[0].regularMarketDayLow+'</td>'+
                                 '<td>'+data[0].sectorName+'</td>'+
-                                '<td style="color:green;">'+data[0].inMarket+' ('+data[0].inMarketPercentage+')</td>'+
-                                '<td style="color:red;">'+data[0].outMarket+' ('+data[0].outMarketPercentage+')</td>'+
+                                '<td colspan="2" style="width:200px"><div class="text-wrap"><div class="text inMarket">'+data[0].inMarket+' ('+data[0].inMarketPercentage+')</div><div class="text outMarket">'+data[0].outMarket+' ('+data[0].outMarketPercentage+')</div></div>'+
+								'<div class="chart inMarket"></div><div class="chart outMarket"></div></td>'+
+                                
                                 '<td><input id="'+clickId+'" type="button" value="X"></td>>'
                                 +'</tr>>'
                             ;
@@ -66,6 +67,10 @@ function showList(list)
                             $('#'+clickId).click(function(){
                                 deleteList(item);
                             });
+							/* 長條圖 */
+							$('.chart.inMarket').css('width',data[0].inMarketPercentage);
+							$('.chart.outMarket').css('width',data[0].outMarketPercentage);
+							
                         });
                 });
         }
