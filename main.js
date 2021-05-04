@@ -20,6 +20,7 @@ function testt(string)
 
 function showList(list)
 {
+    console.log('show')
     chrome.storage.local.get(['teststring1'], function(result) {
         $('#mainTable').empty();
         if(result.teststring1 == null || result.teststring1 == '')
@@ -30,6 +31,7 @@ function showList(list)
         if(listArray.length > 0)
         {
             $('#mainTable').append('<table id="gg1" style="border:3px #cccccc solid;" cellpadding="10" border="1"><tr>'+
+                '<td>K</td>'+
                 '<td>個股</td>'+
                 '<td>價格</td>'+
                 '<td>漲跌</td>'+
@@ -55,8 +57,11 @@ function showList(list)
 							
                             var clickId = 'cancelBtn_id_'+item;
 							var chartId = item + '_chart_' + count;
+							var chartId_K = item + '_K_' + count;
 							var chartIn = $('<div class="chart inMarket"></div>');
 							var chartOut = $('<div class="chart outMarket"></div>');
+							var chartK_1 = $('<div class="chartK_1 chartK"></div>');
+							var chartK_2 = $('<div class="chartK_2 chartK"></div>');
 							/* 長條圖 */
                             /*內盤 外盤*/
                             /*
@@ -65,17 +70,33 @@ function showList(list)
                             outMarket
                             outMarketPercentage
                             */
-                            /**/
 
                             /* 委買 委賣*/
                             var buyRate = (data[0].sumBidVolK / (data[0].sumBidVolK + data[0].sumAskVolK))*100;
                             buyRate = buyRate.toFixed(2);
                             var sellRate = 100 - buyRate;
                             sellRate = sellRate.toFixed(2);
-                            /**/
+                        
+                            /* K線資料 */
+                            var K_info = new Object();
+                            K_info.value1 = data[0].regularMarketDayHigh - data[0].regularMarketDayLow;
+                            K_info.value2 = data[0].price - data[0].regularMarketOpen;
+                            if(K_info.value2 < 0){
+                                K_info.top = K_info.value1-(data[0].regularMarketDayHigh - data[0].regularMarketOpen);
+                                K_info.color = 'green';
+                            }else{
+                                K_info.top = K_info.value1-(data[0].regularMarketDayHigh - data[0].price);
+                                K_info.color = 'red';
+                            }
+                        
+                            /* 圖表設定 */
 							chartIn.css('width',sellRate+'%');
 							chartOut.css('width',buyRate+'%');
+                            chartK_1.css({'height':K_info.value1,'background-color':K_info.color});
+                            chartK_2.css({'height':Math.abs(K_info.value2),'margin-top':-K_info.top,'background-color':K_info.color});
+                        
                             var itemobj = '<tr>'+
+                                '<td id="'+ chartId_K +'"></td>'+
                                 '<td>'+item+'<br>'+data[0].symbolName+'</td>'+
                                 '<td>'+data[0].price+'</td>'+
                                 '<td style="color:'+color+';">'+data[0].change+'<br>'+data[0].changePercent+'</td>'+
@@ -89,6 +110,9 @@ function showList(list)
                             $('#gg1').append(itemobj);
 							$('#'+ chartId).append(chartIn);
 							$('#'+ chartId).append(chartOut);
+							$('#'+ chartId_K).append(chartK_1);
+							$('#'+ chartId_K).append(chartK_2);
+                            $('#'+ chartId_K).append($('<div></div>').css('height',K_info.value1-Math.abs(K_info.value2)))
  
                             $('#'+clickId).click(function(){
                                 deleteList(item);
@@ -98,7 +122,10 @@ function showList(list)
         }
     });
     clearTimeout(mysetTime);
-    mysetTime = setTimeout("showList()",5000);
+    if(new Date().getHours()<14 && new Date().getHours()>8){
+        mysetTime = setTimeout("showList()",5000);
+    }
+    
 }
 
 function search(string)
