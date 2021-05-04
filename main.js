@@ -1,3 +1,4 @@
+var mysetTime = null;
 showList();
 /*測試用*/
 document.getElementById('pic').addEventListener('click',function(){
@@ -96,6 +97,8 @@ function showList(list)
                 });
         }
     });
+    clearTimeout(mysetTime);
+    mysetTime = setTimeout("showList()",5000);
 }
 
 function search(string)
