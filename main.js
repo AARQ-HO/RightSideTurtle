@@ -78,21 +78,24 @@ function showList(list)
                             sellRate = sellRate.toFixed(2);
                         
                             /* K線資料 */
+                            /* 最高高度*/
+                            var chartK_Height = 50;
+                            var limitRange = data[0].limitUpPrice - data[0].limitDownPrice;
                             var K_info = new Object();
-                            K_info.value1 = data[0].regularMarketDayHigh - data[0].regularMarketDayLow;
-                            K_info.value2 = data[0].price - data[0].regularMarketOpen;
+                            K_info.value1 = (data[0].regularMarketDayHigh - data[0].regularMarketDayLow)/limitRange*chartK_Height;
+                            K_info.value2 = (data[0].price - data[0].regularMarketOpen)/limitRange*chartK_Height;
                             if(K_info.value2 < 0){
-                                K_info.top = K_info.value1-(data[0].regularMarketDayHigh - data[0].regularMarketOpen);
+                                K_info.top = K_info.value1-(data[0].regularMarketDayHigh - data[0].regularMarketOpen)/limitRange*chartK_Height;
                                 K_info.color = 'green';
                             }else{
-                                K_info.top = K_info.value1-(data[0].regularMarketDayHigh - data[0].price);
+                                K_info.top = K_info.value1-(data[0].regularMarketDayHigh - data[0].price)/limitRange*chartK_Height;
                                 K_info.color = 'red';
                             }
                         
                             /* 圖表設定 */
 							chartIn.css('width',sellRate+'%');
 							chartOut.css('width',buyRate+'%');
-                            chartK_1.css({'height':K_info.value1,'background-color':K_info.color});
+                            chartK_1.css({'height':K_info.value1,'background-color':'black'});
                             chartK_2.css({'height':Math.abs(K_info.value2),'margin-top':-K_info.top,'background-color':K_info.color});
                         
                             var itemobj = '<tr>'+
@@ -112,7 +115,8 @@ function showList(list)
 							$('#'+ chartId).append(chartOut);
 							$('#'+ chartId_K).append(chartK_1);
 							$('#'+ chartId_K).append(chartK_2);
-                            $('#'+ chartId_K).append($('<div></div>').css('height',K_info.value1-Math.abs(K_info.value2)))
+                            $('#'+ chartId_K).append($('<div></div>').css('height',K_info.value1-Math.abs(K_info.value2)));
+                            $('#'+ chartId_K).css({'height':chartK_Height});
  
                             $('#'+clickId).click(function(){
                                 deleteList(item);
