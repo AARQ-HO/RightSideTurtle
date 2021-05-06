@@ -20,6 +20,7 @@ function testt(string)
 
 function showList(list)
 {
+    var tableCellpadding = 10;
     console.log('show')
     chrome.storage.local.get(['teststring1'], function(result) {
         $('#mainTable').empty();
@@ -30,7 +31,7 @@ function showList(list)
         var listArray = list.split(',');
         if(listArray.length > 0)
         {
-            $('#mainTable').append('<table id="gg1" style="border:3px #cccccc solid;" cellpadding="10" border="1"><tr>'+
+            $('#mainTable').append('<table id="gg1" style="border:3px #cccccc solid;" cellpadding="'+tableCellpadding+'" border="1"><tr>'+
                 '<td>K</td>'+
                 '<td>個股</td>'+
                 '<td>價格</td>'+
@@ -81,23 +82,34 @@ function showList(list)
                             /* 最高高度*/
                             var chartK_Height = 50;
                             var limitRange = data[0].limitUpPrice - data[0].limitDownPrice;
+                            var limitavg = (parseFloat(data[0].limitUpPrice) + parseFloat(data[0].limitDownPrice))/2;
+                            var avgPrice = (parseFloat(data[0].regularMarketDayHigh) + parseFloat(data[0].regularMarketDayLow))/2;
+                            console.log(data[0].symbolName);
                             var K_info = new Object();
+                            /*K線高度*/
                             K_info.value1 = (data[0].regularMarketDayHigh - data[0].regularMarketDayLow)/limitRange*chartK_Height;
+                            /*K棒高度(會有正負)*/
                             K_info.value2 = (data[0].price - data[0].regularMarketOpen)/limitRange*chartK_Height;
+
+                            /*K位置*/
+                            K_info.top1 = chartK_Height - parseFloat((data[0].limitUpPrice - data[0].regularMarketDayHigh)/limitRange*chartK_Height);
+
+                            /*綠棒*/
                             if(K_info.value2 < 0){
-                                K_info.top = K_info.value1-(data[0].regularMarketDayHigh - data[0].regularMarketOpen)/limitRange*chartK_Height;
+                                K_info.top2 = K_info.value1-(data[0].regularMarketDayHigh - data[0].regularMarketOpen)/limitRange*chartK_Height;
                                 K_info.color = 'green';
-                            }else{
-                                K_info.top = K_info.value1-(data[0].regularMarketDayHigh - data[0].price)/limitRange*chartK_Height;
+                            }
+                            /*紅棒*/
+                            else{
+                                K_info.top2 = K_info.value1-(data[0].regularMarketDayHigh - data[0].price)/limitRange*chartK_Height;
                                 K_info.color = 'red';
                             }
-                        
                             /* 圖表設定 */
-							chartIn.css('width',sellRate+'%');
-							chartOut.css('width',buyRate+'%');
-                            chartK_1.css({'height':K_info.value1,'background-color':'black'});
-                            chartK_2.css({'height':Math.abs(K_info.value2),'margin-top':-K_info.top,'background-color':K_info.color});
-                        
+                            chartIn.css('width',sellRate+'%');
+                            chartOut.css('width',buyRate+'%');
+                            chartK_1.css({'height':K_info.value1,'margin-top':-K_info.top1,'background-color':'black'});
+                            chartK_2.css({'height':Math.abs(K_info.value2),'margin-top':-K_info.top2,'background-color':K_info.color});
+
                             var itemobj = '<tr>'+
                                 '<td id="'+ chartId_K +'"></td>'+
                                 '<td>'+item+'<br>'+data[0].symbolName+'</td>'+
@@ -113,10 +125,13 @@ function showList(list)
                             $('#gg1').append(itemobj);
 							$('#'+ chartId).append(chartIn);
 							$('#'+ chartId).append(chartOut);
+                            //$('#'+ chartId_K).append($('<div></div>').css('height','50px'));
+                            $('#'+ chartId_K).append('<div style="height: '+chartK_Height+'px; border: dotted 0.5px; "></div>');
 							$('#'+ chartId_K).append(chartK_1);
 							$('#'+ chartId_K).append(chartK_2);
                             $('#'+ chartId_K).append($('<div></div>').css('height',K_info.value1-Math.abs(K_info.value2)));
                             $('#'+ chartId_K).css({'height':chartK_Height});
+                            $('#'+ chartId_K).css({'display':'block'});
  
                             $('#'+clickId).click(function(){
                                 deleteList(item);
@@ -127,7 +142,7 @@ function showList(list)
     });
     clearTimeout(mysetTime);
     if(new Date().getHours()<14 && new Date().getHours()>8){
-        mysetTime = setTimeout("showList()",5000);
+        mysetTime = setTimeout("showList()",10000);
     }
     
 }
