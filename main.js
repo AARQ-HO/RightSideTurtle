@@ -8,6 +8,30 @@ document.getElementById('pic').addEventListener('click',function(){
 document.getElementById('searchBtn').addEventListener('click',function(){
     search(document.getElementById('searchId').value);
 });
+var DT;
+$(document).ready(function(){
+	/*$("#gg1").find('tbody').sortable();
+	DT = $("#gg1").DataTable({
+		 columnDefs: [
+			{ orderable: false, targets: [0,8] }
+		],
+        "paging":   false,
+        "searching": false,
+        "info":     false
+	});*/
+	
+	$("#toggleBtn").on('click',function(){
+		if($(this).val()=="自我激勵"){
+			$(this).val('龜龜退下')
+			$("#pic").show();
+			$("#mainTable").css("margin-top","0px")
+		}else{
+			$(this).val('自我激勵')
+			$("#pic").hide();	
+			$("#mainTable").css("margin-top","60px")
+		}
+	})
+})
 function testt(string)
 {/*
     chrome.storage.local.get(['teststring1'], function(result) {
@@ -31,18 +55,17 @@ function showList(list)
         var listArray = list.split(',');
         if(listArray.length > 0)
         {
-            $('#mainTable').append('<table id="gg1" style="border:3px #cccccc solid;" cellpadding="'+tableCellpadding+'" border="1"><tr>'+
-                '<td>K</td>'+
-                '<td>個股</td>'+
-                '<td>價格</td>'+
-                '<td>漲跌</td>'+
-                '<td>最高</td>'+
-                '<td>最低</td>'+
-                '<td>類股</td>'+
-                '<td>賣單</td>'+
-                '<td>買單</td>'+
-                '<td>操作</td>'+
-                '</tr></table>');
+            $('#mainTable').append('<table id="gg1" class="table table-striped" style="border:3px #cccccc solid;" cellpadding="'+tableCellpadding+'" border="1"><thead><tr>'+
+                '<th>K</th>'+
+                '<th>個股</th>'+
+                '<th>價格</th>'+
+                '<th>漲跌</th>'+
+                '<th>最高</th>'+
+                '<th>最低</th>'+
+                '<th>類股</th>'+
+                '<th>賣單/買單</th>'+
+                '<th>操作</th>'+
+                '</tr></thead><tbody></tbody></table>');
 				
 			var count = 0;
             $.ajaxSettings.async = false;
@@ -118,15 +141,15 @@ function showList(list)
                                 '<td>'+data[0].regularMarketDayHigh+'</td>'+
                                 '<td>'+data[0].regularMarketDayLow+'</td>'+
                                 '<td>'+data[0].sectorName+'</td>'+
-                                '<td colspan="2" style="width:200px" id="'+ chartId +'" ><div class="text-wrap"><div class="text inMarket">'+data[0].sumAskVolK+' ('+sellRate+')</div><div class="text outMarket">'+data[0].sumBidVolK+' ('+buyRate+')</div><br></div>'+
-                                '<td><input id="'+clickId+'" type="button" value="X"></td>>'
+                                '<td style="width:200px" id="'+ chartId +'" ><div class="text-wrap"><div class="text inMarket">'+data[0].sumAskVolK+' ('+sellRate+')</div><div class="text outMarket">'+data[0].sumBidVolK+' ('+buyRate+')</div><br></div>'+
+                                '<td><input id="'+clickId+'" type="button" class="btn btn-sm btn-danger" value="X"></td>>'
                                 +'</tr>>'
                             ;
-                            $('#gg1').append(itemobj);
+                            $('#gg1').find('tbody').append(itemobj);
 							$('#'+ chartId).append(chartIn);
 							$('#'+ chartId).append(chartOut);
                             //$('#'+ chartId_K).append($('<div></div>').css('height','50px'));
-                            $('#'+ chartId_K).append('<div style="height: '+chartK_Height+'px; border: dotted 0.5px; "></div>');
+                            $('#'+ chartId_K).append('<div style="height: '+chartK_Height+'px; width:10px;border: dotted 0.5px; "></div>');
 							$('#'+ chartId_K).append(chartK_1);
 							$('#'+ chartId_K).append(chartK_2);
                             $('#'+ chartId_K).append($('<div></div>').css('height',K_info.value1-Math.abs(K_info.value2)));
@@ -136,11 +159,29 @@ function showList(list)
                             $('#'+clickId).click(function(){
                                 deleteList(item);
                             });
+							
                         });
                 });
         }
     });
-    clearTimeout(mysetTime);
+	
+	
+	setTimeout(function(){
+		$("#gg1").find('tbody').sortable();
+
+		DT = $("#gg1").DataTable({
+		columnDefs: [
+		{ orderable: false, targets: [0,8] }
+		],
+		"paging":   false,
+		"searching": false,
+		"info":     false,
+		"destroy": true
+		})
+	},1000);
+	
+	
+	clearTimeout(mysetTime);
     if(new Date().getHours()<14 && new Date().getHours()>8){
         mysetTime = setTimeout("showList()",10000);
     }
@@ -167,7 +208,7 @@ function search(string)
                         saveTemp = listArray.join(',');
                     }
 
-                    alert("Data: " + data.ResultSet.Result[0].symbol + "\n name: " + data.ResultSet.Result[0].name);
+                    alert("您將新增的是：\n股票代碼: " + data.ResultSet.Result[0].symbol + "\n股票名稱: " + data.ResultSet.Result[0].name);
                     chrome.storage.local.set({
                         'teststring1': saveTemp
                     }, function() {
@@ -177,7 +218,7 @@ function search(string)
                 });
             }
             else
-                alert('NO');
+                alert('找不到此檔股票！\n請再次確認。');
         });
 }
 
