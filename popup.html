@@ -83,6 +83,26 @@
             display: block;
         }
 
+        #gg1 td {
+            min-width: 54px;
+            font-size: 14px;
+        }
+
+        #gg1 td:first-child {
+            min-width: 12px;
+        }
+        .btnDel{
+            background-image: url(images/Remove.png);
+            background-repeat: no-repeat;
+            background-size: contain;
+            width: 24px;
+            height: 24px;
+            display: block;
+            margin: 10px auto;
+            border:none;
+            background-color: transparent;
+        }
+
     </style>
     <link href="css/bootstrap.min.css" rel="stylesheet">
     <link href="css/jquery-ui.min.css" rel="stylesheet">
@@ -91,14 +111,11 @@
 
 <body id="body">
     <div class="input-area">
-        <form>
-            <div class="input-group">
-                <input type="text" id="searchId" class="form-control" placeholder="輸入台股代號" aria-describedby="searchBtn">
-                <input id="searchBtn" type="submit" class="btn btn-outline-secondary" value="送出">
-
-                <input id="toggleBtn" type="button" class="btn btn-outline-primary" value="龜龜退下">
-            </div>
-        </form>
+        <div class="input-group">
+            <input type="text" id="searchId" class="form-control" placeholder="輸入台股代號" aria-describedby="searchBtn">
+            <input id="searchBtn" type="button" class="btn btn-outline-secondary" value="送出">
+            <input id="toggleBtn" type="button" class="btn btn-outline-primary" value="龜龜退下">
+        </div>
     </div>
     <img id='pic' src="rightT.png">
 
