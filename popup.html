@@ -1,98 +1,114 @@
 <!doctype html>
-<html >
-  <head>
+<html>
+
+<head>
     <title>龜龜 </title>
     <meta charset="UTF-8">
-	<style>
-	body{
-		padding:10px;
-		min-width:800px;
-	}
-	.chart{
-		display:inline-block;
-		height:10px;
-	}
-	
-	.chart.inMarket{
-		background-color:green;
-	}
-	
-	.chart.outMarket{
-		background-color:red;
-	}
-	
-	.text{
-		background-color:none;
-	}
-	.text.inMarket{
-		float:left;
-		color:green;
-	}
-	.text.outMarket{
-		float:right;
-		color:red;
-	}
-    .chartK{
-        background-color:gray;            
-    }
-    .chartK_1{
-        width:2px;    
-        margin-left: 4px;
-    }
-    .chartK_2{
-        /*position: absolute;*/
-        width:10px;    
-    }
-	.ui-sortable-helper td{
-		display:table-cell !important;
-	}
-	tr.ui-sortable-helper{
-		background:white;
-		opacity:0.6;
-		border:dashed 1px gray;
-	}
-	
-	table.dataTable thead .sorting_disabled.sorting_asc{
-		background-image:none !important;
-	}
-	.input-area{
-	    margin-top: -10px;
-    margin-left: -10px;
-    border-bottom: solid 1px #dcdcdc;
-    width: 100%;
-    position: fixed;
-    background: white;
-    padding: 10px;
-	z-index:999;
-	}
-	#pic{
-		margin-top:30px;
-	}
-	</style>
-	<link href="css/bootstrap.min.css" rel="stylesheet">
-	<link href="css/jquery-ui.min.css" rel="stylesheet">
-	<link href="css/jquery.dataTables.min.css" rel="stylesheet">
-  </head>
+    <style>
+        body {
+            padding: 10px;
+            min-width: 800px;
+        }
 
-  <body id="body">
-  <div class="input-area">
-  <form>
-  <div class="input-group">
-  <input type="text" id="searchId" class="form-control" placeholder="輸入台股代號" aria-describedby="searchBtn">
-  <input id="searchBtn" type="button" class="btn btn-outline-secondary" value="送出">
-  
-    <input id="toggleBtn" type="button" class="btn btn-outline-primary" value="龜龜退下">
-  </div>
-  </form>
-  </div>
-	<img id='pic' src="rightT.png">
-	
-  <div id="mainTable"></div>
-  </body>
-  <script src="jquery-3.1.0.js"></script>
-  <script src="js/bootstrap.min.js"></script>
-  <script src="js/jquery-ui.min.js"></script>
-  <script src="js/jquery.dataTables.min.js"></script>
-  <script src="main.js"></script>
-  <script src="math.js"></script>
+        .chart {
+            display: inline-block;
+            height: 10px;
+        }
+
+        .chart.inMarket {
+            background-color: green;
+        }
+
+        .chart.outMarket {
+            background-color: red;
+        }
+
+        .text {
+            background-color: none;
+        }
+
+        .text.inMarket {
+            float: left;
+            color: green;
+        }
+
+        .text.outMarket {
+            float: right;
+            color: red;
+        }
+
+        .chartK {
+            background-color: gray;
+        }
+
+        .chartK_1 {
+            width: 2px;
+            margin-left: 4px;
+        }
+
+        .chartK_2 {
+            /*position: absolute;*/
+            width: 10px;
+        }
+
+        .ui-sortable-helper td {
+            display: table-cell !important;
+        }
+
+        tr.ui-sortable-helper {
+            background: white;
+            opacity: 0.6;
+            border: dashed 1px gray;
+        }
+
+        table.dataTable thead .sorting_disabled.sorting_asc,
+        table.dataTable thead .sorting_disabled.sorting {
+            background-image: none !important;
+        }
+
+        .input-area {
+            margin-top: -10px;
+            margin-left: -10px;
+            border-bottom: solid 1px #dcdcdc;
+            width: 100%;
+            position: fixed;
+            background: white;
+            padding: 10px;
+            z-index: 999;
+        }
+
+        #pic {
+            margin: 0px auto;
+            margin-top: 30px;
+            display: block;
+        }
+
+    </style>
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/jquery-ui.min.css" rel="stylesheet">
+    <link href="css/jquery.dataTables.min.css" rel="stylesheet">
+</head>
+
+<body id="body">
+    <div class="input-area">
+        <form>
+            <div class="input-group">
+                <input type="text" id="searchId" class="form-control" placeholder="輸入台股代號" aria-describedby="searchBtn">
+                <input id="searchBtn" type="submit" class="btn btn-outline-secondary" value="送出">
+
+                <input id="toggleBtn" type="button" class="btn btn-outline-primary" value="龜龜退下">
+            </div>
+        </form>
+    </div>
+    <img id='pic' src="rightT.png">
+
+    <div id="mainTable"></div>
+</body>
+<script src="jquery-3.1.0.js"></script>
+<script src="js/bootstrap.min.js"></script>
+<script src="js/jquery-ui.min.js"></script>
+<script src="js/jquery.dataTables.min.js"></script>
+<script src="main.js"></script>
+<script src="math.js"></script>
+
 </html>
