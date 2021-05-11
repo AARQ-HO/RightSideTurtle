@@ -128,6 +128,12 @@
             opacity: 0.6;
         }
 
+        #face path {
+    stroke: rgba(68, 68, 68, 0.31);
+    stroke-width: 2;
+    /* fill: #fafafa; */
+}
+        
     </style>
     <link href="css/bootstrap.min.css" rel="stylesheet">
     <link href="css/jquery-ui.min.css" rel="stylesheet">
@@ -143,6 +149,16 @@
         </div>
     </div>
     <img id='pic' src="rightT.png">
+    <svg id="face" xmlns="http://www.w3.org/2000/svg" height="200" width="200" viewBox="0 0 65 65">
+<path id="s4-mouth" fill="none" stroke-linecap="round" stroke-linejoin="round" d="M19.38 39.9s4.86 5.29 12.77 5.29c7.91 0 12.77-5.29 12.77-5.29">
+<animate id="s4-sad" begin="indefinite" fill="freeze" attributeName="d" dur="500ms" to="M19.38 39.9s4.86 5.29 12.77 -5.29c0.91 -5.29 12.77-0.29 12.77-0.29"></animate>
+<animate id="s4-happy" begin="indefinite" fill="freeze" attributeName="d" dur="500ms" to="M19.38 39.9s4.86 5.29 12.77 5.29c7.91 0 12.77-5.29 12.77-5.29"></animate>
+<animate id="s4-soso" begin="indefinite" fill="freeze" attributeName="d" dur="500ms" to="M19.38 39.9s4.86 0.29 12.77 0.29c5.91 0 12.77-0 12.77-0.1"></animate>
+</path>
+
+<circle id="eyewL" cx="23" cy="20" r="8" fill="none"></circle>
+<circle id="eyewR" cx="42" cy="20" r="8" fill="none"></circle>
+</svg>
 
     <div id="mainTable"></div>
 </body>
