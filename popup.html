@@ -84,14 +84,32 @@
         }
 
         #gg1 td {
-            min-width: 54px;
+            min-width: 48px;
             font-size: 14px;
         }
 
         #gg1 td:first-child {
             min-width: 12px;
+            padding: 10px 20px;
         }
-        .btnDel{
+
+        #gg1 td:nth-child(2) {
+            padding-right: 0px;
+            padding-left: 0px;
+            min-width: 75px;
+        }
+
+        #gg1 th:nth-child(2) {
+            padding-left: 0px;
+        }
+
+        #gg1 td:nth-child(8) {
+            min-width: 156px;
+            padding: 10px 0px;
+            font-size: 10px;
+        }
+
+        .btnDel {
             background-image: url(images/Remove.png);
             background-repeat: no-repeat;
             background-size: contain;
@@ -99,8 +117,15 @@
             height: 24px;
             display: block;
             margin: 10px auto;
-            border:none;
+            border: none;
             background-color: transparent;
+        }
+
+        .imgMore {
+            vertical-align: super;
+            position: absolute;
+            padding: 2px;
+            opacity: 0.6;
         }
 
     </style>

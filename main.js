@@ -69,19 +69,19 @@ function showList(list) {
                     /*  */
                     $.get("https://tw.stock.yahoo.com/_td-stock/api/resource/StockServices.stockList;fields=avgPrice%2Corderbook;symbols=" + item, function (d, s) {
                         try {
-                             showList_Callback(d, s, item, count);
+                            showList_Callback(d, s, item, count);
                         } catch (e) {
                             console.log(e);
-                            
+
                         }
-                       
+
                     });
                 });
         }
     })
 
 
-
+    /* 一秒後重新增加外掛功能，不重載後可以移除此定時 */
     setTimeout(function () {
         $("#gg1").find('tbody').sortable();
 
@@ -97,29 +97,31 @@ function showList(list) {
         })
     }, 1000);
 
-
+    /* 十秒重刷一次 */
     clearTimeout(mysetTime);
     if (new Date().getHours() < 14 && new Date().getHours() > 8) {
-        mysetTime = setTimeout("showList()", 10000);
+        //mysetTime = setTimeout("showList()", 10000);
     }
 
 }
 
 function showList_Callback(data, status, item, count) {
-   
-    if(!data[0]){
+
+    if (!data[0]) {
         /* 會有找得到代號卻無資料的情況 帶入必須是她找到的symbo */
-         console.log(data)
+        console.log(data)
         return
     }
-    if (data[0].change > 0)
+    if (data[0].change > 0) {
         var color = 'red';
-    else
+    } else {
         var color = 'green';
+    }
 
-    var clickId = 'cancelBtn_id_' + item;
-    var chartId = item + '_chart_' + count;
-    var chartId_K = item + '_K_' + count;
+    var itemForId = item.replace(/.TWO|.TW/ig, "");
+    var clickId = 'cancelBtn_id_' + itemForId;
+    var chartId = itemForId + '_chart_' + count;
+    var chartId_K = itemForId + '_K_' + count;
     var chartIn = $('<div class="chart inMarket"></div>');
     var chartOut = $('<div class="chart outMarket"></div>');
     var chartK_1 = $('<div class="chartK_1 chartK"></div>');
@@ -145,7 +147,6 @@ function showList_Callback(data, status, item, count) {
     var limitRange = data[0].limitUpPrice - data[0].limitDownPrice;
     var limitavg = (parseFloat(data[0].limitUpPrice) + parseFloat(data[0].limitDownPrice)) / 2;
     var avgPrice = (parseFloat(data[0].regularMarketDayHigh) + parseFloat(data[0].regularMarketDayLow)) / 2;
-    console.log(data[0].symbolName);
     var K_info = new Object();
     /*K線高度*/
     K_info.value1 = (data[0].regularMarketDayHigh - data[0].regularMarketDayLow) / limitRange * chartK_Height;
@@ -179,17 +180,32 @@ function showList_Callback(data, status, item, count) {
         'background-color': K_info.color
     });
 
-    var itemobj = '<tr>' +
-        '<td id="' + chartId_K + '"></td>' +
-        '<td>' + item + '<br>' + data[0].symbolName + '</td>' +
-        '<td>' + data[0].price + '</td>' +
-        '<td style="color:' + color + ';">' + data[0].change + '<br>' + data[0].changePercent + '</td>' +
-        '<td>' + data[0].regularMarketDayHigh + '</td>' +
-        '<td>' + data[0].regularMarketDayLow + '</td>' +
-        '<td>' + data[0].sectorName + '</td>' +
-        '<td style="width:250px" id="' + chartId + '" ><div class="text-wrap"><div class="text inMarket">' + data[0].sumAskVolK + ' (' + sellRate + ')</div><div class="text outMarket">' + data[0].sumBidVolK + ' (' + buyRate + ')</div><br></div>' +
-        '<td><input id="' + clickId + '" type="button" class="btnDel"></td>>' +
-        '</tr>>';
+    var symboName = data[0].symbolName;
+    var nameSpan = '<span>' + symboName + '</span>';
+    if (symboName.length > 4) {
+        symboName = symboName.slice(0, 4);
+        nameSpan = '<span>' + symboName + '<img class="imgMore" src="images/more.png" title="' + data[0].symbolName + '" /></span>'
+    }
+
+    var itemobj;
+
+    try {
+        itemobj = '<tr>' +
+            '<td id="' + chartId_K + '"></td>' +
+            '<td>' + item + '<br>' + nameSpan + '</td>' +
+            '<td>' + data[0].price + '</td>' +
+            '<td style="color:' + color + ';">' + data[0].change + '<br>' + data[0].changePercent + '</td>' +
+            '<td>' + data[0].regularMarketDayHigh + '</td>' +
+            '<td>' + data[0].regularMarketDayLow + '</td>' +
+            '<td>' + data[0].sectorName + '</td>' +
+            '<td style="width:250px" id="' + chartId + '" ><div class="text-wrap"><div class="text inMarket">' + data[0].sumAskVolK + ' (' + sellRate + ')</div><div class="text outMarket">' + data[0].sumBidVolK + ' (' + buyRate + ')</div><br></div>' +
+            '<td><input id="' + clickId + '" type="button" class="btnDel"></td>>' +
+            '</tr>>';
+    } catch (e) {
+        console.log(e)
+        itemobj = '<tr><td id="' + chartId_K + '">"' + e.message + '"</td>';
+    }
+
     $('#gg1').find('tbody').append(itemobj);
     $('#' + chartId).append(chartIn);
     $('#' + chartId).append(chartOut);
@@ -216,28 +232,44 @@ function search(string) {
     console.log('!! ' + string);
     $.get("https://tw.stock.yahoo.com/_td-stock/api/resource/AutocompleteService;query=" + string,
         function (data, status) {
-            /* 之後要跑回圈確認是不是有其他筆資料來自台股 */
-            if (data.length != 0 && (data.ResultSet.Result[0].exch == 'TWO' || data.ResultSet.Result[0].exch == 'TAI')) {
-                chrome.storage.local.get(['teststring1'], function (result) {
-                    if (result.teststring1 == null || result.teststring1 == '') {
-                        saveTemp = string;
-                    } else {
-                        temp = result.teststring1;
-                        var listArray = temp.split(',');
-                        listArray.push(string);
-                        saveTemp = listArray.join(',');
-                    }
+            var isInTW = false;
+            if (data.ResultSet && data.ResultSet.Result.length != 0) {
+                /* 跑迴圈搜尋結果清單是否有台股項目，找到第一項即停止 */
+                for (var i = 0; i < data.ResultSet.Result.length; i++) {
+                    if (data.ResultSet.Result[i].exch == 'TWO' || data.ResultSet.Result[i].exch == 'TAI') {
+                        chrome.storage.local.get(['teststring1'], function (result) {
+                            /* 改存API找到的symbo 而非原本自己鍵入搜尋的字串 */
+                            if (result.teststring1 == null || result.teststring1 == '') {
+                                saveTemp = data.ResultSet.Result[i].symbol;
+                            } else {
+                                temp = result.teststring1;
+                                var listArray = temp.split(',');
+                                listArray.push(data.ResultSet.Result[i].symbol);
+                                saveTemp = listArray.join(',');
+                            }
 
-                    alert("您將新增的是：\n股票代碼: " + data.ResultSet.Result[0].symbol + "\n股票名稱: " + data.ResultSet.Result[0].name);
-                    chrome.storage.local.set({
-                        'teststring1': saveTemp
-                    }, function () {
-                        console.log('Value is set to ' + saveTemp);
-                    });
-                    showList();
-                });
-            } else
+                            var confirmAdd = confirm("您將新增的是：\n股票代碼: " + data.ResultSet.Result[i].symbol + "\n股票名稱: " + data.ResultSet.Result[i].name);
+                            if (confirmAdd) {
+                                chrome.storage.local.set({
+                                    'teststring1': saveTemp
+                                }, function () {
+                                    console.log('Value is set to ' + saveTemp);
+                                });
+                                showList();
+                            }
+                        });
+                        isInTW = true;
+                        break;
+                    }
+                }
+
+                if (!isInTW) {
+                    alert('台股中找不到此檔股票！\n請再次確認。');
+                }
+
+            } else {
                 alert('找不到此檔股票！\n請再次確認。');
+            }
         });
 }
 
