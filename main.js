@@ -96,11 +96,13 @@ function showList(list) {
             "destroy": true
         })
     }, 1000);
+    
+    TurtleMood();
 
     /* 十秒重刷一次 */
     clearTimeout(mysetTime);
     if (new Date().getHours() < 14 && new Date().getHours() > 8) {
-        //mysetTime = setTimeout("showList()", 10000);
+        mysetTime = setTimeout("showList()", 10000);
     }
 
 }
@@ -333,7 +335,7 @@ function svgAnimate(num) {
     }
 }
 
-function TurtleFace() {
+function TurtleMood() {
     $.get("https://tw.stock.yahoo.com/_td-stock/api/resource/StockServices.stockList;fields=avgPrice%2Corderbook;symbols=%5ETWII",
         function (data, status) {
             var change = 0;
@@ -342,13 +344,13 @@ function TurtleFace() {
             if (data[0]) {
                 change = eval((data[0].changePercent).replace("%", "")).toFixed(0);
             }
-        
+
             console.log(change)
             if (change < 0) {
                 /* 當大盤為負 */
                 svgAnimate(-change)
-            }else{
-                svgAnimate(change+smileNum)
+            } else {
+                svgAnimate(change + smileNum)
             }
 
 
