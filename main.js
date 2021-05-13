@@ -19,10 +19,12 @@ $(document).ready(function () {
         if ($(this).val() == "自我激勵") {
             $(this).val('龜龜退下')
             $("#pic").show();
+            $("#TurFace").show();
             $("#mainTable").css("margin-top", "0px")
         } else {
             $(this).val('自我激勵')
             $("#pic").hide();
+            $("#TurFace").hide();
             $("#mainTable").css("margin-top", "60px")
         }
     })
@@ -293,6 +295,7 @@ function deleteList(id) {
 }
 
 function svgAnimate(num) {
+console.log(num)
     var animateSet = []
     animateSet[0] = [];
     animateSet[1] = [];
@@ -339,21 +342,20 @@ function TurtleMood() {
     $.get("https://tw.stock.yahoo.com/_td-stock/api/resource/StockServices.stockList;fields=avgPrice%2Corderbook;symbols=%5ETWII",
         function (data, status) {
             var change = 0;
-            var smileNum = 6;
+            var smileNum = 7;
 
             if (data[0]) {
-                change = eval((data[0].changePercent).replace("%", "")).toFixed(0);
+                change = data[0].changePercent.replace("%", "");
+                change = eval(change).toFixed(0);
             }
-
-            console.log(change)
+        
+        console.log(change)
             if (change < 0) {
                 /* 當大盤為負 */
-                svgAnimate(-change)
+                svgAnimate(-eval(change))
             } else {
-                svgAnimate(change + smileNum)
+                svgAnimate(eval(change) + smileNum)
             }
-
-
         })
 
 
