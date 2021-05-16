@@ -262,23 +262,6 @@ function updateList(list) {
         }
     })
 
-
-    /* 一秒後重新增加外掛功能，不重載後可以移除此定時 */
-    setTimeout(function () {
-        $("#gg1").find('tbody').sortable();
-
-        DT = $("#gg1").DataTable({
-            columnDefs: [{
-                orderable: false,
-                targets: [0, 8]
-            }],
-            "paging": false,
-            "searching": false,
-            "info": false,
-            "destroy": true
-        })
-    }, 1000);
-
     TurtleMood();
 
     /* 十秒重刷一次 */
