@@ -103,7 +103,7 @@ function showList(list) {
 
     /* 十秒重刷一次 */
     clearTimeout(mysetTime);
-    if (true) {
+    if (new Date().getHours() < 14 && new Date().getHours() > 8) {
         /*建置完後 就只跑UPDATE*/
         mysetTime = setTimeout("updateList()", 10000);
     }
