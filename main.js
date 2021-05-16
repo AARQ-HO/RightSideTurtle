@@ -59,7 +59,7 @@ function showList(list) {
                 '<th class="sorting">最高</th>' +
                 '<th class="sorting">最低</th>' +
                 '<th class="sorting">類股</th>' +
-                '<th class="sorting">賣單/買單</th>' +
+                '<th class="sorting">內盤/外盤</th>' +
                 '<th class="sorting">功能</th>' +
                 '</tr></thead><tbody></tbody></table>');
 
@@ -103,8 +103,9 @@ function showList(list) {
 
     /* 十秒重刷一次 */
     clearTimeout(mysetTime);
-    if (new Date().getHours() < 14 && new Date().getHours() > 8) {
-        mysetTime = setTimeout("showList()", 10000);
+    if (true) {
+        /*建置完後 就只跑UPDATE*/
+        mysetTime = setTimeout("updateList()", 10000);
     }
 
 }
@@ -116,6 +117,7 @@ function showList_Callback(data, status, item, count) {
         console.log(data)
         return
     }
+
     if (data[0].change > 0) {
         var color = 'red';
     } else {
@@ -140,11 +142,12 @@ function showList_Callback(data, status, item, count) {
     */
 
     /* 委買 委賣*/
+    /*
     var buyRate = (data[0].sumBidVolK / (data[0].sumBidVolK + data[0].sumAskVolK)) * 100;
     buyRate = buyRate.toFixed(2);
     var sellRate = 100 - buyRate;
     sellRate = sellRate.toFixed(2);
-
+    */
     /* K線資料 */
     /* 最高高度*/
     var chartK_Height = 50;
@@ -171,8 +174,8 @@ function showList_Callback(data, status, item, count) {
         K_info.color = 'red';
     }
     /* 圖表設定 */
-    chartIn.css('width', sellRate + '%');
-    chartOut.css('width', buyRate + '%');
+    chartIn.css('width', data[0].inMarketPercentage);
+    chartOut.css('width', data[0].outMarketPercentage);
     chartK_1.css({
         'height': K_info.value1,
         'margin-top': -K_info.top1,
@@ -194,23 +197,24 @@ function showList_Callback(data, status, item, count) {
     var itemobj;
 
     try {
-        itemobj = '<tr>' +
+        itemobj = '<tr id="'+itemForId+'">' +
             '<td id="' + chartId_K + '"></td>' +
-            '<td>' + item + '<br>' + nameSpan + '</td>' +
-            '<td>' + data[0].price + '</td>' +
-            '<td style="color:' + color + ';">' + data[0].change + '<br>' + data[0].changePercent + '</td>' +
-            '<td>' + data[0].regularMarketDayHigh + '</td>' +
-            '<td>' + data[0].regularMarketDayLow + '</td>' +
-            '<td>' + data[0].sectorName + '</td>' +
-            '<td style="width:250px" id="' + chartId + '" ><div class="text-wrap"><div class="text inMarket">' + data[0].sumAskVolK + ' (' + sellRate + ')</div><div class="text outMarket">' + data[0].sumBidVolK + ' (' + buyRate + ')</div><br></div>' +
-            '<td><input id="' + clickId + '" type="button" class="btnDel"></td>>' +
+            '<td class="stockName">' + item + '<br>' + nameSpan + '</td>' +
+            '<td class="stockPrice">' + data[0].price + '</td>' +
+            '<td class="stockChange" style="color:' + color + ';">' + data[0].change + '<br>' + data[0].changePercent + '</td>' +
+            '<td class="stockMarketDayHight">' + data[0].regularMarketDayHigh + '</td>' +
+            '<td class="stockMarketDayLow" class="stockPrice">' + data[0].regularMarketDayLow + '</td>' +
+            '<td class="stockSectorName">' + data[0].sectorName + '</td>' +
+            '<td class="stockInOut" style="width:250px" id="' + chartId + '" ><div class="text-wrap"><div class="text inMarket">' + data[0].inMarket + ' (' + data[0].inMarketPercentage + ')</div><div class="text outMarket">' + data[0].outMarket + ' (' + data[0].outMarketPercentage + ')</div><br></div>' +
+            '<td class=""><input id="' + clickId + '" type="button" class="btnDel"></td>>' +
             '</tr>>';
     } catch (e) {
-        console.log(e)
+        console.log(e);
         itemobj = '<tr><td id="' + chartId_K + '">"' + e.message + '"</td>';
     }
 
     $('#gg1').find('tbody').append(itemobj);
+
     $('#' + chartId).append(chartIn);
     $('#' + chartId).append(chartOut);
     //$('#'+ chartId_K).append($('<div></div>').css('height','50px'));
@@ -230,6 +234,139 @@ function showList_Callback(data, status, item, count) {
         deleteList(item);
     });
 
+}
+
+function updateList(list) {
+    console.log('update')
+    chrome.storage.local.get(['teststring1'], function (result) {
+        if (result.teststring1 == null || result.teststring1 == '')
+            return;
+        list = result.teststring1;
+        console.log('Value currently is ' + list);
+        var listArray = list.split(',');
+        if (listArray.length > 0) {
+            $.ajaxSettings.async = false;
+            listArray.forEach(
+                item => {
+            /*  */
+            $.get("https://tw.stock.yahoo.com/_td-stock/api/resource/StockServices.stockList;fields=avgPrice%2Corderbook;symbols=" + item, function (d, s) {
+                try {
+                    updateStock(d, item);
+                } catch (e) {
+                    console.log(e);
+
+                }
+
+            });
+        });
+        }
+    })
+
+
+    /* 一秒後重新增加外掛功能，不重載後可以移除此定時 */
+    setTimeout(function () {
+        $("#gg1").find('tbody').sortable();
+
+        DT = $("#gg1").DataTable({
+            columnDefs: [{
+                orderable: false,
+                targets: [0, 8]
+            }],
+            "paging": false,
+            "searching": false,
+            "info": false,
+            "destroy": true
+        })
+    }, 1000);
+
+    TurtleMood();
+
+    /* 十秒重刷一次 */
+    clearTimeout(mysetTime);
+    if (new Date().getHours() < 14 && new Date().getHours() > 8) {
+        mysetTime = setTimeout("updateList()", 10000);
+    }
+
+}
+
+function updateStock(data,item)
+{
+    if (!data[0]) {
+        /* 會有找得到代號卻無資料的情況 帶入必須是她找到的symbo */
+        console.log(data)
+        return
+    }
+    if (data[0].change > 0) {
+        var color = 'red';
+    } else {
+        var color = 'green';
+    }
+
+    var itemForId = item.replace(/.TWO|.TW/ig, "");
+    /* 長條圖 */
+    /*內盤 外盤*/
+    /*
+    inMarket
+    inMarketPercentage
+    outMarket
+    outMarketPercentage
+    */
+
+    /* 委買 委賣*/
+    /*
+    var buyRate = (data[0].sumBidVolK / (data[0].sumBidVolK + data[0].sumAskVolK)) * 100;
+    buyRate = buyRate.toFixed(2);
+    var sellRate = 100 - buyRate;
+    sellRate = sellRate.toFixed(2);
+    */
+
+    /* K線資料 */
+    /* 最高高度*/
+    var chartK_Height = 50;
+    var limitRange = data[0].limitUpPrice - data[0].limitDownPrice;
+    var limitavg = (parseFloat(data[0].limitUpPrice) + parseFloat(data[0].limitDownPrice)) / 2;
+    var avgPrice = (parseFloat(data[0].regularMarketDayHigh) + parseFloat(data[0].regularMarketDayLow)) / 2;
+    var K_info = new Object();
+    /*K線高度*/
+    K_info.value1 = (data[0].regularMarketDayHigh - data[0].regularMarketDayLow) / limitRange * chartK_Height;
+    /*K棒高度(會有正負)*/
+    K_info.value2 = (data[0].price - data[0].regularMarketOpen) / limitRange * chartK_Height;
+
+    /*K位置*/
+    K_info.top1 = chartK_Height - parseFloat((data[0].limitUpPrice - data[0].regularMarketDayHigh) / limitRange * chartK_Height);
+
+    /*綠棒*/
+    if (K_info.value2 < 0) {
+        K_info.top2 = K_info.value1 - (data[0].regularMarketDayHigh - data[0].regularMarketOpen) / limitRange * chartK_Height;
+        K_info.color = 'green';
+    }
+    /*紅棒*/
+    else {
+        K_info.top2 = K_info.value1 - (data[0].regularMarketDayHigh - data[0].price) / limitRange * chartK_Height;
+        K_info.color = 'red';
+    }
+
+    try {
+        $('#'+itemForId+' .stockPrice').html(data[0].price);
+        $('#'+itemForId+' .stockChange').css("color",color);
+        $('#'+itemForId+' .stockChange').html(data[0].change+'<br>'+data[0].changePercent);
+        $('#'+itemForId+' .stockPrice').html(data[0].price);
+        $('#'+itemForId+' .stockMarketDayHight').html(data[0].regularMarketDayHigh);
+        $('#'+itemForId+' .stockMarketDayLow').html(data[0].regularMarketDayLow);
+        $('#'+itemForId+' .chart.inMarket').css('width',data[0].inMarketPercentage);
+        $('#'+itemForId+' .text.inMarket').html(data[0].inMarket+' ('+data[0].inMarketPercentage+')');
+        $('#'+itemForId+' .chart.outMarket').css('width',data[0].outMarketPercentage);
+        $('#'+itemForId+' .text.outMarket').html(data[0].outMarket+' ('+data[0].outMarketPercentage+')');
+
+        $('#'+itemForId+' .chartK_1').css('height',K_info.value1);
+        $('#'+itemForId+' .chartK_1').css('margin-top',-K_info.top1);
+        $('#'+itemForId+' .chartK_2').css('height',Math.abs(K_info.value2));
+        $('#'+itemForId+' .chartK_2').css('margin-top',-K_info.top2);
+        $('#'+itemForId+' .chartK_2').css('background-color',K_info.color);
+
+    } catch (e) {
+        console.log(e);
+    }
 }
 
 function search(string) {
