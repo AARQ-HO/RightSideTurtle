@@ -1,0 +1,13 @@
+chrome.notifications.create(
+                                undefined,
+                                {
+                                    type: 'basic',
+                                    iconUrl: "./imgs/arrow_orang.png",
+                                    title: item.Name + "(" + item.ID + ")",
+                                    message: "當前價(" + item.Price + ")已達警示值 !"
+                                }
+                            );
+
+
+"permissions": ["notifications"]
+
